@@ -2,7 +2,9 @@ import { StatusBar } from 'expo-status-bar'
 import React, { useEffect, useState } from 'react'
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native'
 
-import { ethers } from 'ethers'
+import Rebot from './Rebot.json'
+
+import Web3 from 'web3'
 
 export default function App() {
 
@@ -15,25 +17,17 @@ export default function App() {
   //load ether
   useEffect(() => {
     async function load () {
-    let wallet = ethers.Wallet.fromMnemonic('sea peace bike clock whip caution fiber wrist force pair disease release')
-    const provider = new ethers.getDefaultProvider('ropsten')
-    wallet = wallet.connect(provider)
-
-    const ABI = [
-      'function nmb(uint8 _nr) public',
-      'function str(string memory _string) public view returns(string memory)'
-    ]
-    const contract = new ethers.Contract('0xc5F13aE40e06114eDe1d250D526838Cc7D2E85D4',
-                                          ABI,
-                                          provider)
-
+    const web3 = new Web3('https://ropsten.infura.io/v3/a9464a6968ab4a509cefe50f66baa7f9')
+    const contract = new web3.eth.Contract(Rebot.abi, '0xc5F13aE40e06114eDe1d250D526838Cc7D2E85D4')
+    const account = await web3.eth.getBlockNumber()
+    console.log(account)
     setContract(contract)
     }
     load()
   }, [])
 
   const xd = async () => {
-    const data = await rebotContract.str(input)
+    const data = await rebotContract.methods.str(input).call()
 
     settxt(data)
   }
